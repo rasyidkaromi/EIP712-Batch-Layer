@@ -28,14 +28,19 @@ const WalletCardEthers = ({ socket }) => {
 	const [forNonce, setForNonce] = useState(10)
 	const [forGasLimit, setForGasLimit] = useState(1000)
 
-	const [disableButton, setDisableButton] = useState(false)
+	const [disableButtonBatch, setDisableButtonBatch] = useState(false)
+	const [disableButtonSingle, setDisableButtonSingle] = useState(false)
 	const [timeoutBath, setTimeOutBatch] = useState(10000)
+
+	const [singleInfo, setSingleInfo] = useState('')
+	const [batchInfo, setBatchInfo] = useState('')
 
 
 	const [singleAccount, setSingleAccount] = useState({
 		to: '0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199',
 		amount: 100
 	})
+	const [batchAccountSend, setBachAccountSend] = useState({})
 	const [batchAccount, setBatchAccount] = useState([
 		{
 			to: '0x70997970c51812dc3a010c7d01b50e0d17dc79c8',
@@ -45,10 +50,26 @@ const WalletCardEthers = ({ socket }) => {
 			to: '0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc',
 			amount: 100,
 			gasLimit: forGasLimit,
+		}, {
+			to: '',
+			amount: 0,
+			gasLimit: forGasLimit,
+		}, {
+			to: '',
+			amount: 0,
+			gasLimit: forGasLimit,
+		}, {
+			to: '',
+			amount: 0,
+			gasLimit: forGasLimit,
+		}, {
+			to: '',
+			amount: 0,
+			gasLimit: forGasLimit,
 		}
 	])
 
-	const contract = '0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f'
+	const contract = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
 
 	useEffect(() => {
 		socket.on('update', (data) => {
@@ -57,10 +78,20 @@ const WalletCardEthers = ({ socket }) => {
 			}
 			if (data.type == 'transferBatch') {
 				setBatchHashTransaction(data.hash)
-				setDisableButton(true)
+				setDisableButtonBatch(true)
 				BatchTimeOutButtonDisable()
 			}
 		})
+
+		let bufferBatch = [...batchAccount]
+		let bufSend = []
+		bufferBatch.forEach((val, i) => {
+			if (isAddress(val.to) && Number(val.amount) !== 0 && val.amount !== "") {
+				bufSend.push(val)
+			}
+		})
+		setBachAccountSend(bufSend)
+
 	}, [])
 
 	useEffect(() => {
@@ -94,7 +125,7 @@ const WalletCardEthers = ({ socket }) => {
 			signer: defaultAccount,
 			signature: userSignDataBatch,
 			nonce: forNonce,
-			payload: batchAccount
+			payload: batchAccountSend
 		})
 	}, [userSignDataBatch])
 
@@ -115,7 +146,7 @@ const WalletCardEthers = ({ socket }) => {
 
 	const BatchTimeOutButtonDisable = () => {
 		setTimeout(() => {
-			setDisableButton(false)
+			setDisableButtonBatch(false)
 		}, timeoutBath);
 
 	}
@@ -195,7 +226,7 @@ const WalletCardEthers = ({ socket }) => {
 	const signDataBatch = async () => {
 		let msg = {
 			"nonce": forNonce,
-			"payload": batchAccount
+			"payload": batchAccountSend
 		}
 		let msgParams = {
 			"types": {
@@ -237,15 +268,42 @@ const WalletCardEthers = ({ socket }) => {
 	const batchAccountChange_amount = (idx, val) => {
 		let bufferBatch = [...batchAccount]
 		bufferBatch[idx].amount = val.target.value
+		let bufSend = []
+		bufferBatch.forEach((val, i) => {
+			if (val.amount === "" || Number(val.amount) === 0 || val.to === "") {
+
+			} else {
+				if (isAddress(val.to)) {
+					bufSend.push(val)
+				}
+			}
+		})
 		setBatchAccount(bufferBatch)
+		setBachAccountSend(bufSend)
 	}
 
 	const batchAccountChange_to = (idx, val) => {
 		let bufferBatch = [...batchAccount]
 		bufferBatch[idx].to = val.target.value
-		setBatchAccount(bufferBatch)
-	}
+		let bufSend = []
+		bufferBatch.forEach((val, i) => {
+			if (val.amount === "" || Number(val.amount) === 0 || val.to === "") {
 
+			} else {
+				if (isAddress(val.to)) {
+					bufSend.push(val)
+				}
+			}
+		})
+		setBatchAccount(bufferBatch)
+		setBachAccountSend(bufSend)
+	}
+	const isAddress = (address) => {
+		try {
+			ethers.utils.getAddress(address);
+		} catch (e) { return false; }
+		return true;
+	}
 
 	return (
 		<>
@@ -289,16 +347,30 @@ const WalletCardEthers = ({ socket }) => {
 				<div className='walletCard'>
 					<h4> Sign and single transaction with Relayer Service </h4>
 					<h4> nonce {forNonce}</h4>
+					<h4> {singleInfo}</h4>
 					account : <input
 						name="gasLimit"
 						type="tex"
 						value={singleAccount.to}
 						onChange={(res) => {
-							const newMessageObj = {
-								to: res.target.value,
-								amount: singleAccount.amount
-							};
-							setSingleAccount(newMessageObj)
+
+							if (isAddress(res.target.value)) {
+								setDisableButtonSingle(false)
+								setSingleInfo('')
+								const newMessageObj = {
+									to: res.target.value,
+									amount: singleAccount.amount
+								};
+								setSingleAccount(newMessageObj)
+							} else {
+								setDisableButtonSingle(true)
+								setSingleInfo('Wrong Address')
+								const newMessageObj = {
+									to: res.target.value,
+									amount: singleAccount.amount
+								};
+								setSingleAccount(newMessageObj)
+							}
 						}} />
 					<br />
 					amount : <input
@@ -306,14 +378,29 @@ const WalletCardEthers = ({ socket }) => {
 						type="number"
 						value={singleAccount.amount}
 						onChange={(res) => {
-							const newMessageObj = {
-								to: singleAccount.to,
-								amount: Number(res.target.value)
-							};
-							setSingleAccount(newMessageObj)
+							if (res.target.valuet === "" || Number(res.target.value) === 0 || singleAccount.to === "") {
+								setDisableButtonSingle(true)
+								if (isAddress(singleAccount.to)) {
+									const newMessageObj = {
+										to: singleAccount.to,
+										amount: Number(res.target.value)
+									};
+									setSingleAccount(newMessageObj)
+
+								}
+							} else {
+								setDisableButtonSingle(false)
+								if (isAddress(singleAccount.to)) {
+									const newMessageObj = {
+										to: singleAccount.to,
+										amount: Number(res.target.value)
+									};
+									setSingleAccount(newMessageObj)
+								}
+							}
 						}} />
 					<br />	<br />
-					<button onClick={signDataSingle}>{connButtonText4}</button>
+					<button disabled={disableButtonSingle} onClick={signDataSingle}>{connButtonText4}</button>
 					<div className='balanceDisplay'>
 						<h3>Sign V4: </h3>
 						<div style={{
@@ -360,7 +447,7 @@ const WalletCardEthers = ({ socket }) => {
 										batchAccountChange_to(index, val)
 									}} value={val.to} />
 								&nbsp;
-								amount : <input type="text"
+								amount : <input type="number"
 									className="form-control"
 									onChange={(val) => {
 										batchAccountChange_amount(index, val)
@@ -369,7 +456,7 @@ const WalletCardEthers = ({ socket }) => {
 						)
 					})}
 					<br />	<br />
-					<button disabled={disableButton} onClick={signDataBatch}>{connButtonText5}</button>
+					<button disabled={disableButtonBatch} onClick={signDataBatch}>{connButtonText5}</button>
 					<div className='balanceDisplay'>
 						<h3>Sign V4: </h3>
 						<div style={{

@@ -43,7 +43,12 @@ account reference use in this case
   <br><br><br>
  </div>
 
+<br><br>
+  <div align="center" >
+<img  src="https://i.ibb.co/rwpXByK/screenB.jpg"  width="780px"  />
+</div>
+
 <br>
   <div align="center" >
-<img  src="https://i.ibb.co/1smDBMB/screen.jpg"  width="780px"  />
+<img  src="https://i.ibb.co/TTnfzPd/screenA.jpg"  width="780px"  />
 </div>

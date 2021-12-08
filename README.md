@@ -14,7 +14,7 @@ submitted transactions and submit multiple transactions in one meta-transaction
 5. get and copy file MetaTransaction.json from folder smartcontracts/artifacts/contracts/MetaTransaction.sol  
 6. paste MetaTransaction.json file on relayer folder
 7. paste token from deploy address to 
-    - file WalletCardEthers.js from user/src folder  | line 51
+    - file WalletCardEthers.js from user/src folder  | line 72
     - file server.js from relayer folder | line 22
 8. see and change owner private key on server.js if deferent from Hardhat first/owner address
 

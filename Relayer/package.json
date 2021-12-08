@@ -1,0 +1,12 @@
+{
+  "name": "eip712 batch server layer",
+  "version": "1.0.0",
+  "main": "server.js",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "ethers": "^5.1.4",
+    "express": "^4.17.1",
+    "socket.io": "^4.4.0"
+  }
+}

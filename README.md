@@ -4,7 +4,7 @@ submitted transactions and submit multiple transactions in one meta-transaction
 
 1. install depedencies npm install or yarn
 2. running hardhat 
-    - npx hardhat node
+    - npx hardhat node => chainId: 99999
     - npx hardhat run --network localhost scripts/deployMetaTransaction.js
     - copy save token address from deploy command
 3. run relayer server

@@ -412,7 +412,7 @@ const WalletCardEthers = ({ socket }) => {
 							fontSize: 15,
 							width: "100%",
 							wordWrap: 'break-word',
-						}}></div>
+						}}>Hash : {singleHashTransaction}</div>
 						<br />
 					</div>
 				</div>
@@ -468,7 +468,7 @@ const WalletCardEthers = ({ socket }) => {
 							fontSize: 15,
 							width: "100%",
 							wordWrap: 'break-word',
-						}}></div>
+						}}>Hash : {batchHashTransaction}</div>
 						<br />
 					</div>
 				</div>

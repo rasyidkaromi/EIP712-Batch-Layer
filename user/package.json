@@ -1,5 +1,5 @@
 {
-  "name": "eip712 batch layer",
+  "name": "eip712batchlayer",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
